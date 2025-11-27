@@ -1,0 +1,27 @@
+
+package:
+  name: cinema4d-corona
+  version: "2025"
+
+source:
+- path: ../../archive_files/cinema4d-corona-2025/win-64 # [win64]
+
+build:
+  number: 0
+  binary_relocation: false
+  detect_binary_files_with_prefix: false
+  ignore_prefix_files: true
+  missing_dso_whitelist:
+    - "**"
+
+requirements:
+  run:
+    - cinema4d >=2025
+
+about:
+  homepage: https://www.chaos.com/corona/cinema-4d
+  documentation: https://documentation.chaos.com/space/CRC4D
+  license: LicenseRef-ChaosEULA
+  summary: |
+    Corona Renderer is a high-performance photorealistic rendering engine.
+    Corona Renderer for Cinema 4D is a 3D rendering plugin for Cinema 4D that's used to create visual effects and animations for film, television, and other industries.
