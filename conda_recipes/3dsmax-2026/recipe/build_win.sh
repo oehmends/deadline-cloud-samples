@@ -23,8 +23,10 @@ rm -rf "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 cmd <<EOF
 setlocal
-robocopy "$(cygpath -w "$SRC_ROOT")" "$(cygpath -w "$INSTALL_DIR")" /E /COPYALL /R:1 /W:1 >nul
+rem Use robocopy without ACL/owner copying to avoid access denied; accept codes 0-7 as success.
+robocopy "$(cygpath -w "$SRC_ROOT")" "$(cygpath -w "$INSTALL_DIR")" /E /COPY:DAT /DCOPY:DAT /R:1 /W:1 /NFL /NDL >nul
 set RC=%ERRORLEVEL%
+echo Robocopy exit code: %RC%
 if %RC% GEQ 8 exit /b %RC%
 exit /b 0
 EOF
