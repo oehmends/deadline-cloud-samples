@@ -60,6 +60,7 @@ export ADSK_3DSMAX_LOCATION="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"
 export ADSK_3DSMAX_PYTHON="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/python.exe"
 export ADSK_3DSMAX_BATCH_EXE="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
 export ADSK_3DSMAX_EXECUTABLE="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
+export 3DSMAX_EXECUTABLE="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
 export PATH="\$(cygpath "\$CONDA_PREFIX/bin"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PATH"
 export PYTHONPATH="\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PYTHONPATH"
 EOF
@@ -82,6 +83,7 @@ export PATH="\${PATH/\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Py
 export PATH="\${PATH/\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"):/}"
 export PYTHONPATH="\${PYTHONPATH/\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):/}"
 export PYTHONPATH="\${PYTHONPATH/\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python"):/}"
+unset 3DSMAX_EXECUTABLE
 unset ADSK_3DSMAX_EXECUTABLE
 unset ADSK_3DSMAX_BATCH_EXE
 unset ADSK_3DSMAX_PYTHON
