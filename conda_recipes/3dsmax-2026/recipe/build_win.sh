@@ -18,9 +18,16 @@ if [ ! -f "$SRC_ROOT/3dsmax.exe" ]; then
     fi
 fi
 
-# Copy the extracted files into the install location (robust against read-only flags).
+# Copy the extracted files into the install location (robust against read-only flags and file/dir collisions).
+rm -rf "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
-cp -R "$SRC_ROOT/." "$INSTALL_DIR"
+cmd <<EOF
+setlocal
+robocopy "$(cygpath -w "$SRC_ROOT")" "$(cygpath -w "$INSTALL_DIR")" /E /COPYALL /R:1 /W:1 >nul
+set RC=%ERRORLEVEL%
+if %RC% GEQ 8 exit /b %RC%
+exit /b 0
+EOF
 
 # The conda-build environment sets pip to offline/no-deps by default; allow installs for 3ds Max Python.
 unset PIP_NO_DEPENDENCIES
