@@ -51,3 +51,46 @@ for use by the conda build recipe.
 The build script installs `pywin32` into 3ds Max's embedded Python to enable automation and sets environment
 variables (`ADSK_3DSMAX_*`, plus `3DSMAX_EXECUTABLE` in the Windows activation script) to simplify invoking
 `3dsmaxbatch.exe` from Deadline Cloud jobs.
+
+## Required host dependencies
+3ds Max 2026 requires .NET 8 runtimes to be present on the host OS. Install them (with admin rights) before running jobs:
+
+- .NET 8 SDK 8.0.416 (includes .NET, ASP.NET Core, and Desktop runtimes): `ods-sandbox/accounts/deadline/smf/fleets/ods-deadlinedemo-win-cpu-smf-3dsmax_dotnet.ps1`
+
+Run that PowerShell script during fleet/bootstrap setup to ensure the required runtimes are available on the worker.
+
+PowerShell snippet (for convenience if the repo isn’t available):
+
+```powershell
+# Install .NET 8 SDK (x64) which includes .NET Runtime, ASP.NET Core Runtime, and .NET Desktop Runtime 8.0.22
+$sdkDisplayPrefix = "Microsoft .NET SDK 8.0.416"
+$sdkDownloadUri   = "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.416/dotnet-sdk-8.0.416-win-x64.exe"
+$sdkInstaller     = Join-Path $env:TEMP ([IO.Path]::GetFileName($sdkDownloadUri))
+
+$sdkExisting = Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* |
+    Where-Object { $_.DisplayName -like "$sdkDisplayPrefix*" }
+
+if (-not $sdkExisting) {
+    Write-Host "Downloading .NET 8 SDK from $sdkDownloadUri ..."
+    Invoke-WebRequest -Uri $sdkDownloadUri -OutFile $sdkInstaller -UseBasicParsing
+    Write-Host "Installing .NET 8 SDK silently (includes runtime, ASP.NET Core, and Desktop runtimes)..."
+    Start-Process -FilePath $sdkInstaller -ArgumentList "/install", "/quiet", "/norestart" -Wait
+    $sdkInstalled = Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* |
+        Where-Object { $_.DisplayName -like "$sdkDisplayPrefix*" }
+    if ($sdkInstalled) {
+        Write-Host ".NET 8 SDK installed: $($sdkInstalled.DisplayName)"
+    } else {
+        Write-Host ".NET 8 SDK not detected after install." -ForegroundColor Red
+    }
+    Remove-Item $sdkInstaller -Force -ErrorAction SilentlyContinue
+} else {
+    Write-Host ".NET 8 SDK already installed: $($sdkExisting.DisplayName)"
+}
+```
+
+## Notes on environment variables
+- POSIX shells cannot export variable names that start with a digit, so `3DSMAX_EXECUTABLE` cannot be set by the `.sh` activation script. The Windows `.bat` sets it, but bash activation relies on the ADSK-prefixed variables instead.
+- The adaptor’s `executable_handler.py` needs to be hotpatched in a Conda environment before the run to fall back to `ADSK_3DSMAX_EXECUTABLE` / `ADSK_3DSMAX_BATCH_EXE` when `3DSMAX_EXECUTABLE` is absent. Keep this in mind if you update or replace the handler.
+
+## Renderer plug-ins (e.g., Corona)
+If you intend to render with Corona or other third-party renderers, ensure their DLLs are present in the 3ds Max plug-in search path (e.g., `Autodesk/3ds Max 2026/Plugins`). The main 3dsmax package does not carry Corona binaries; use the `3dsmax-corona` package to place the real Corona DLLs into the environment. Without that package (or manually copied DLLs), Max will warn about missing plug-ins and the adaptor will fail.
