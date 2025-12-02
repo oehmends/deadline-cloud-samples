@@ -1,0 +1,5 @@
+condaPlatforms:
+  - platform: win-64
+    defaultSubmit: true
+    sourceArchiveDirectory: 3dsmax-corona/win-64/
+    buildTool: conda-build
