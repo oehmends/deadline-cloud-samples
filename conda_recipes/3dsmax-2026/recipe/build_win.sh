@@ -39,13 +39,7 @@ unset PIP_NO_INDEX
 # Ensure 3ds Max's bundled Python has pip and pywin32 available for automation.
 "$INSTALL_DIR\\Python\\python.exe" -m ensurepip
 "$INSTALL_DIR\\Python\\python.exe" -m pip install pywin32
-
-# Provide a wrapper that maps calls to `3dsmax` onto the batch-friendly executable.
-mkdir -p "$PREFIX/bin"
-cat <<EOF > "$PREFIX/bin/3dsmax.bat"
-@echo off
-"%~dp0\..\Autodesk\3ds Max $MAX_VERSION\3dsmaxbatch.exe" %*
-EOF
+"$INSTALL_DIR\\Python\\python.exe" -m pip install deadline-cloud-for-3ds-max --upgrade
 
 mkdir -p "$PREFIX/etc/conda/activate.d"
 mkdir -p "$PREFIX/etc/conda/deactivate.d"
@@ -60,6 +54,10 @@ export ADSK_3DSMAX_LOCATION="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"
 export ADSK_3DSMAX_PYTHON="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/python.exe"
 export ADSK_3DSMAX_BATCH_EXE="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
 export ADSK_3DSMAX_EXECUTABLE="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
+export ADSK_3DSMAX_ROOT="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"
+export ADSK_3DSMAX_PLUGINS_ADDON_DIR="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Plugins"
+export ADSK_APPLICATION_PLUGINS="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Plugins"
+export ADSK_3DSMAX_X64_${MAX_VERSION}="\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"
 export PATH="\$(cygpath "\$CONDA_PREFIX/bin"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PATH"
 export PYTHONPATH="\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PYTHONPATH"
 EOF
@@ -70,6 +68,11 @@ set "ADSK_3DSMAX_VERSION=$MAX_VERSION"
 set "ADSK_3DSMAX_LOCATION=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION"
 set "ADSK_3DSMAX_PYTHON=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python\\python.exe"
 set "ADSK_3DSMAX_BATCH_EXE=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\3dsmaxbatch.exe"
+set "ADSK_3DSMAX_EXECUTABLE=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\3dsmaxbatch.exe"
+set "ADSK_3DSMAX_ROOT=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION"
+set "ADSK_3DSMAX_PLUGINS_ADDON_DIR=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Plugins"
+set "ADSK_APPLICATION_PLUGINS=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Plugins"
+set "ADSK_3DSMAX_X64_${MAX_VERSION}=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION"
 set "3DSMAX_EXECUTABLE=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\3dsmaxbatch.exe"
 set "PATH=%CONDA_PREFIX%\\bin;%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION;%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python;%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python\\Scripts;%PATH%"
 set "PYTHONPATH=%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python;%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python\\Scripts;%PYTHONPATH%"
@@ -87,6 +90,10 @@ unset ADSK_3DSMAX_BATCH_EXE
 unset ADSK_3DSMAX_PYTHON
 unset ADSK_3DSMAX_LOCATION
 unset ADSK_3DSMAX_VERSION
+unset ADSK_3DSMAX_ROOT
+unset ADSK_3DSMAX_PLUGINS_ADDON_DIR
+unset ADSK_APPLICATION_PLUGINS
+unset ADSK_3DSMAX_X64_${MAX_VERSION}
 EOF
 cat "$PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh"
 
@@ -96,6 +103,11 @@ set "PYTHONPATH=%PYTHONPATH:%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Pyth
 set "PYTHONPATH=%PYTHONPATH:%CONDA_PREFIX%\\Autodesk\\3ds Max $MAX_VERSION\\Python\\Scripts;=%"
 set 3DSMAX_EXECUTABLE=
 set ADSK_3DSMAX_BATCH_EXE=
+set ADSK_3DSMAX_EXECUTABLE=
+set ADSK_3DSMAX_ROOT=
+set ADSK_3DSMAX_PLUGINS_ADDON_DIR=
+set ADSK_APPLICATION_PLUGINS=
+set ADSK_3DSMAX_X64_${MAX_VERSION}=
 set ADSK_3DSMAX_PYTHON=
 set ADSK_3DSMAX_LOCATION=
 set ADSK_3DSMAX_VERSION=
