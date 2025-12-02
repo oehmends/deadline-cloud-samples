@@ -1,5 +1,0 @@
-condaPlatforms:
-  - platform: win-64
-    defaultSubmit: true
-    sourceArchiveDirectory: 3dsmax-3dstoC/win-64/
-    buildTool: conda-build
