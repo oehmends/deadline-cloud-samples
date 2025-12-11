@@ -5,6 +5,3 @@ condaPlatforms:
     - Autodesk_3dsMax_2026_Windows_installation.zip
     sourceDownloadInstructions: 'Follow the README instructions to create the Windows archive from an installed 3ds Max 2026.'
     buildTool: conda-build
-jobParameters:
-  - name: CondaChannels
-    value: conda-forge
