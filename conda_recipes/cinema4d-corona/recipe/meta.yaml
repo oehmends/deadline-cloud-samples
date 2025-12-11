@@ -1,10 +1,13 @@
 
+{% set corona_version = environ.get("CORONA_VERSION", "13.2") %}
+{% set corona_version_dash = corona_version.replace(".", "-") %}
+
 package:
   name: cinema4d-corona
-  version: "2025"
+  version: "{{ corona_version }}"
 
 source:
-- path: ../../archive_files/cinema4d-corona-2025/win-64 # [win64]
+- path: ../../archive_files/cinema4d-corona-{{ corona_version_dash }}/win-64 # [win64]
 
 build:
   number: 0
