@@ -1,5 +1,5 @@
 
-{% set corona_version = environ.get("CORONA_VERSION", "13.2") %}
+{% set corona_version = environ.get("CORONA_VERSION", "2025.14.0") %}
 {% set corona_version_dash = corona_version.replace(".", "-") %}
 
 package:
