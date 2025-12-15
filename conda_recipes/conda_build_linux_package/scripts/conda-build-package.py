@@ -109,6 +109,8 @@ def main():
     parser.add_argument("--variant-config-file")
     parser.add_argument("--enable-fast-build", choices=("true", "false"), default="false")
     parser.add_argument("--extra-build-tool-args", default="")
+    # Maintain parity with the rattler-build script and avoid attribute errors in shared logic.
+    parser.add_argument("--build-tool", default="conda-build")
     args = parser.parse_args()
 
     session = boto3.Session()
