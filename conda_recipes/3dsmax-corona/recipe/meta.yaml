@@ -1,5 +1,5 @@
-{% set name = "3dsmax-corona" %}
-{% set version = "13.1" %}
+{% set name = "3dsmax-corona-2025" %}
+{% set version = "13.2" %}
 
 package:
   name: {{ name }}
@@ -7,7 +7,7 @@ package:
 
 source:
   # Plugin payload extracted under archive_files/3dsmax-corona/win-64
-  - path: ../../archive_files/3dsmax-corona/win-64  # [win64]
+  - path: ../../archive_files/3dsmax-corona-2025-13-2/win-64  # [win64]
 
 build:
   skip: true  # [not win64]
