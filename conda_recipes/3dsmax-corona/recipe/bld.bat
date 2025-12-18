@@ -1,8 +1,10 @@
 @echo off
 setlocal enableextensions enabledelayedexpansion
 
+set "MAX_VERSION=2025"
+
 rem Install Corona to the expected Chaos path under the conda prefix.
-set "TARGET=%PREFIX%\Program Files\Chaos\Corona\Corona Renderer for 3ds Max\2026"
+set "TARGET=%PREFIX%\Program Files\Chaos\Corona\Corona Renderer for 3ds Max\%MAX_VERSION%"
 if not exist "%TARGET%" mkdir "%TARGET%"
 
 rem /E recursive, /I assume destination is a directory, /H copy hidden, /Y overwrite
@@ -22,15 +24,15 @@ set "DEACTIVATE_BAT=%DEACTIVATE_DIR%\%PKG_NAME%-%PKG_VERSION%-vars.bat"
 
 (
   echo #!/bin/sh
-  echo export CORONA_3DSMAX_2026_LOAD_PATH=\"$(cygpath "%TARGET%")\"
+  echo export CORONA_3DSMAX_%MAX_VERSION%_LOAD_PATH=\"$(cygpath "%TARGET%")\"
 ) > "%ACTIVATE_SH%"
 
 (
   echo #!/bin/sh
-  echo unset CORONA_3DSMAX_2026_LOAD_PATH
+  echo unset CORONA_3DSMAX_%MAX_VERSION%_LOAD_PATH
 ) > "%DEACTIVATE_SH%"
 
-echo set "CORONA_3DSMAX_2026_LOAD_PATH=%TARGET%" > "%ACTIVATE_BAT%"
-echo set CORONA_3DSMAX_2026_LOAD_PATH= > "%DEACTIVATE_BAT%"
+echo set "CORONA_3DSMAX_%MAX_VERSION%_LOAD_PATH=%TARGET%" > "%ACTIVATE_BAT%"
+echo set CORONA_3DSMAX_%MAX_VERSION%_LOAD_PATH= > "%DEACTIVATE_BAT%"
 
 exit /b 0
