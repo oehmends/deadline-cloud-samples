@@ -1,0 +1,32 @@
+{% set name = "3dsmax-plugins" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  # Plugin payload extracted under archive_files/3dsmax-plugins/win-64
+  - path: ../../archive_files/3dsmax-plugins/win-64  # [win64]
+
+build:
+  skip: true  # [not win64]
+  number: 0
+  binary_relocation: false
+  detect_binary_files_with_prefix: false
+  missing_dso_whitelist:
+    - "**"
+
+requirements:
+  run:
+    - 3dsmax >=2025,<2026
+
+about:
+  home: https://www.autodesk.com/products/3ds-max
+  documentation: https://help.autodesk.com/view/3DSMAX/2025/ENU/
+  license: LicenseRef-Proprietary
+  summary: Plug-in bundle for Autodesk 3ds Max 2025
+  description: |
+    Packages a collection of plug-ins for 3ds Max 2025 into the conda environment.
+    The payload is copied into the 3ds Max installation under the conda prefix
+    and should be installed alongside the matching 3dsmax conda package.
