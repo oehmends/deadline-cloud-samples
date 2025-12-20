@@ -6,8 +6,8 @@ package:
   version: {{ version }}
 
 source:
-  # Plugin payload extracted under archive_files/3dsmax-corona/win-64
-  - path: ../../archive_files/3dsmax-corona-2025-13-2/win-64  # [win64]
+  # Plugin payload extracted under archive_files/3dsmax-corona/win-64/Corona
+  - path: ../../archive_files/3dsmax-corona-2025-13-2/win-64/Corona  # [win64]
 
 build:
   skip: true  # [not win64]
@@ -27,6 +27,6 @@ about:
   license: LicenseRef-ChaosEULA
   summary: Corona Renderer plug-in for Autodesk 3ds Max
   description: |
-    Packages the Corona Renderer for 3ds Max (13.1) into the conda environment.
+    Packages the Corona Renderer for 3ds Max (13.2) into the conda environment.
     The plug-in payload is copied into the 3ds Max plugins folder; the package
     should be installed alongside the matching 3dsmax conda package.

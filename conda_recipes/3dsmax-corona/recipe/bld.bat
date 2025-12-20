@@ -4,11 +4,13 @@ setlocal enableextensions enabledelayedexpansion
 set "MAX_VERSION=2025"
 
 rem Install Corona to the expected Chaos path under the conda prefix.
-set "TARGET=%PREFIX%\Program Files\Chaos\Corona\Corona Renderer for 3ds Max\%MAX_VERSION%"
+set "TARGET_ROOT=%PREFIX%\Program Files\Chaos\Corona"
+set "TARGET=%TARGET_ROOT%\Corona Renderer for 3ds Max\%MAX_VERSION%"
+if not exist "%TARGET_ROOT%" mkdir "%TARGET_ROOT%"
 if not exist "%TARGET%" mkdir "%TARGET%"
 
 rem /E recursive, /I assume destination is a directory, /H copy hidden, /Y overwrite
-xcopy "%SRC_DIR%" "%TARGET%" /E /I /H /Y >nul
+xcopy "%SRC_DIR%\*" "%TARGET_ROOT%" /E /I /H /Y >nul
 if errorlevel 1 exit /b 1
 
 rem Add activation hooks to expose the Corona load path
