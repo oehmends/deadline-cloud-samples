@@ -3,5 +3,5 @@ condaPlatforms:
     defaultSubmit: true
     # Keep this path in sync with CORONA_VERSION in recipe/meta.yaml
     # (version numbers use dashes instead of dots).
-    sourceArchiveDirectory: cinema4d-corona-13-2/win-64/
+    sourceArchiveDirectory: cinema4d-corona-2025-13-2/win-64/
     buildTool: conda-build
