@@ -56,7 +56,7 @@ export ADSK_3DSMAX_BATCH_EXE="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX
 export ADSK_3DSMAX_EXECUTABLE="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/3dsmaxbatch.exe"
 export ADSK_3DSMAX_ROOT="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION"
 export ADSK_3DSMAX_PLUGINS_ADDON_DIR="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Plugins"
-export ADSK_APPLICATION_PLUGINS="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Plugins"
+export ADSK_APPLICATION_PLUGINS="\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Plugins;\$CONDA_PREFIX/ProgramData/Autodesk/ApplicationPlugins"
 export PATH="\$(cygpath "\$CONDA_PREFIX/bin"):\$(cygpath "\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION"):\$(cygpath "\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PATH"
 export PYTHONPATH="\$(cygpath "\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Python"):\$(cygpath "\$CONDA_PREFIX/Program Files/Autodesk/3ds Max $MAX_VERSION/Python/Scripts"):\$PYTHONPATH"
 EOF
@@ -70,7 +70,7 @@ set "ADSK_3DSMAX_BATCH_EXE=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX
 set "ADSK_3DSMAX_EXECUTABLE=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\3dsmaxbatch.exe"
 set "ADSK_3DSMAX_ROOT=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION"
 set "ADSK_3DSMAX_PLUGINS_ADDON_DIR=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Plugins"
-set "ADSK_APPLICATION_PLUGINS=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Plugins"
+set "ADSK_APPLICATION_PLUGINS=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Plugins;%CONDA_PREFIX%\\ProgramData\\Autodesk\\ApplicationPlugins"
 set "3DSMAX_EXECUTABLE=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\3dsmaxbatch.exe"
 set "PATH=%CONDA_PREFIX%\\bin;%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION;%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Python;%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Python\\Scripts;%PATH%"
 set "PYTHONPATH=%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Python;%CONDA_PREFIX%\\Program Files\\Autodesk\\3ds Max $MAX_VERSION\\Python\\Scripts;%PYTHONPATH%"
