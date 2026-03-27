@@ -11,7 +11,8 @@ package:
 
 source:
   url: file://archive_files/vray_adv_${{ version_vray | replace(".", "") }}_maya${{ version_maya }}_rhel8
-  sha256: 1d7525640e5e69123d3be24330f8a4f841e5aab49c9c703199c12cd3e5c28eba
+  # sha256: 1d7525640e5e69123d3be24330f8a4f841e5aab49c9c703199c12cd3e5c28eba
+  sha256: 9d55422e401899c0e792e45756e16025edbf8c46b33b8ff1cc61a0452116ea76
 
 build:
   number: 0
