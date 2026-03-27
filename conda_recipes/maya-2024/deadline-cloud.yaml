@@ -1,0 +1,17 @@
+condaPlatforms:
+  - platform: linux-64
+    defaultSubmit: true
+    sourceArchiveFilename:
+    - Autodesk_Maya_2024_Linux_64bit.tgz
+    sourceDownloadInstructions: 'Download the Autodesk_Maya_2024_Linux_64bit.tgz full download file from Autodesk.'
+    buildTool: rattler-build
+  # - platform: win-64
+  #   defaultSubmit: false
+  #   sourceArchiveFilename:
+  #   - Autodesk_Maya_2024_0_Windows_installation.zip
+  #   sourceDownloadInstructions: 'Follow the instructions in README.md to construct the archive zip file.'
+  #   buildTool: conda-build
+jobParameters:
+  # conda-forge is used to get patchelf on Linux
+  - name: CondaChannels
+    value: conda-forge
