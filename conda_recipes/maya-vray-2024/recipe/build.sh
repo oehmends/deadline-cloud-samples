@@ -7,6 +7,7 @@ MAYA_VERSION=2024
 MAYA_VRAY_ROOT="$PREFIX/opt/chaos/maya-vray-$MAYA_VERSION"
 MAYA_VRAY_VRAY_ROOT="$MAYA_VRAY_ROOT/vray"
 MAYA_VRAY_MAYA_ROOT="$MAYA_VRAY_ROOT/maya_vray"
+MAYA_MODULE_ROOT="$PREFIX/usr/autodesk/modules/maya"
 mkdir -p $MAYA_VRAY_ROOT
 cd $MAYA_VRAY_ROOT
 
@@ -50,10 +51,12 @@ for FILE in "$MAYA_VRAY_ROOT"/lib/aux/*.so.*; do
     patchelf --add-rpath '$ORIGIN/.' "$FILE"
 done
 
-mkdir -p "$PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION"
-cp $MAYA_VRAY_ROOT/maya_root/modules/VRayForMaya.module $PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION
-sed -i "s|+ VRayForMaya2024rhel8 0.9 ../../maya_vray|+ VRayForMaya2024rhel8 0.9 $MAYA_VRAY_MAYA_ROOT|" $PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION/VRayForMaya.module
-if grep -q "$MAYA_VRAY_MAYA_ROOT" "$PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION/VRayForMaya.module"; then
+mkdir -p "$MAYA_MODULE_ROOT/$MAYA_VERSION"
+cp "$MAYA_VRAY_ROOT/maya_root/modules/VRayForMaya.module" "$MAYA_MODULE_ROOT/VRayForMaya.module"
+cp "$MAYA_MODULE_ROOT/VRayForMaya.module" "$MAYA_MODULE_ROOT/$MAYA_VERSION/VRayForMaya.module"
+sed -i "s|+ VRayForMaya2024rhel8 0.9 ../../maya_vray|+ VRayForMaya2024rhel8 0.9 $MAYA_VRAY_MAYA_ROOT|" "$MAYA_MODULE_ROOT/VRayForMaya.module"
+cp "$MAYA_MODULE_ROOT/VRayForMaya.module" "$MAYA_MODULE_ROOT/$MAYA_VERSION/VRayForMaya.module"
+if grep -q "$MAYA_VRAY_MAYA_ROOT" "$MAYA_MODULE_ROOT/VRayForMaya.module"; then
     echo "Changing maya_root/VRayForMaya.module file path to $MAYA_VRAY_MAYA_ROOT succeeded"
 else
     echo "Failed to change maya_root/VRayForMaya.module file path "
@@ -64,11 +67,20 @@ fi
 mkdir -p $PREFIX/etc/conda/activate.d
 cat <<EOF > $PREFIX/etc/conda/activate.d/$PKG_NAME-$PKG_VERSION-vars.sh
 export "VRAY_EULA=https://docs.chaos.com/display/VNS/End+User+License+Agreement"
+if [ -n "\${MAYA_PLUG_IN_PATH:-}" ]; then
+    export MAYA_PLUG_IN_PATH="$MAYA_VRAY_MAYA_ROOT/plug-ins:\$MAYA_PLUG_IN_PATH"
+else
+    export MAYA_PLUG_IN_PATH="$MAYA_VRAY_MAYA_ROOT/plug-ins"
+fi
 EOF
 
 mkdir -p $PREFIX/etc/conda/deactivate.d
 cat <<EOF > $PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh
-if ! [ -z \$VRAY ]; then 
-    unset VRAY_EULA
+if [ -n "\${MAYA_PLUG_IN_PATH:-}" ]; then
+    export MAYA_PLUG_IN_PATH="\${MAYA_PLUG_IN_PATH#$MAYA_VRAY_MAYA_ROOT/plug-ins:}"
+    if [ "\$MAYA_PLUG_IN_PATH" = "$MAYA_VRAY_MAYA_ROOT/plug-ins" ]; then
+        unset MAYA_PLUG_IN_PATH
+    fi
 fi
+unset VRAY_EULA
 EOF
