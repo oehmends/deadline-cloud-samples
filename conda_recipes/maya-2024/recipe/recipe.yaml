@@ -2,13 +2,13 @@
 # See https://prefix-dev.github.io/rattler-build/latest/
 
 context:
-  version: "2024.2.4"
+  version: "2024.2"
   major_version: "2024"
-  minor_version: "2.4"
+  minor_version: "2"
 
 package:
   name: maya
-  version: ${{ version }}
+  version: ${{ major_version }}
 
 source:
   path: ../../archive_files/Autodesk_Maya_${{ major_version }}_Linux_64bit.tgz
