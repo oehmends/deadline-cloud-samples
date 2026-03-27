@@ -14,7 +14,7 @@ source:
   sha256: 86daa18f02a5384cc2f15b1ed0582ead69400196a3646f38ca09161af105a35e
 
 build:
-  number: 2
+  number: 0
   # These build options for repackaging an application
   # https://prefix-dev.github.io/rattler-build/latest/build_options/#prefix-detection-replacement-options
   prefix_detection:
