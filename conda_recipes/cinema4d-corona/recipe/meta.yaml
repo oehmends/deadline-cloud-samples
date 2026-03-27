@@ -1,5 +1,5 @@
 
-{% set corona_version = environ.get("CORONA_VERSION", "2025.13.2") %}
+{% set corona_version = environ.get("CORONA_VERSION", "2026.14.1") %}
 {% set corona_version_dash = corona_version.replace(".", "-") %}
 
 package:
@@ -19,7 +19,7 @@ build:
 
 requirements:
   run:
-    - cinema4d >=2025
+    - cinema4d >=2026
 
 about:
   homepage: https://www.chaos.com/corona/cinema-4d
