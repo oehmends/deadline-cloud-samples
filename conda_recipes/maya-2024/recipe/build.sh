@@ -16,8 +16,22 @@ INSTALL_DIR="$PREFIX/$MAYA_ROOT"
 
 cd $PREFIX
 
+# Resolve the Maya RPM from Autodesk's package manifest because the RPM build
+# number does not necessarily match the Conda package version.
+MAYA_RPM_PATH="$(sed -n 's/.*file="\([^"]*Maya[^"]*\.rpm\)".*/\1/p' "$SRC_DIR/installer/Packages/pkg.maya.xml" | head -n 1)"
+if [ -n "$MAYA_RPM_PATH" ]; then
+    MAYA_RPM_PATH="$SRC_DIR/installer/$MAYA_RPM_PATH"
+else
+    MAYA_RPM_PATH="$(echo "$SRC_DIR/installer/Packages"/Maya${MAYA_MAJOR_VERSION}_64-*.x86_64.rpm)"
+fi
+
+if [ ! -f "$MAYA_RPM_PATH" ]; then
+    echo "Could not find Maya RPM under $SRC_DIR/installer/Packages" >&2
+    exit 1
+fi
+
 # Extract the Maya RPM
-rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_MAJOR_VERSION}_64-$PKG_VERSION-*.x86_64.rpm | cpio -idm
+rpm2cpio "$MAYA_RPM_PATH" | cpio -idm
 
 # Remove examples, they're not needed on the farm
 rm -r "$MAYA_ROOT"/Examples
