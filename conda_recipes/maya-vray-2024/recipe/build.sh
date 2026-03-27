@@ -2,13 +2,13 @@
 set -xeuo pipefail
 
 MAYA_VERSION=2024
+MAYA_MODULE_VERSION=2024.2
 
 # Where we will install V-Ray for Maya
 MAYA_VRAY_ROOT="$PREFIX/opt/chaos/maya-vray-$MAYA_VERSION"
 MAYA_VRAY_VRAY_ROOT="$MAYA_VRAY_ROOT/vray"
 MAYA_VRAY_MAYA_ROOT="$MAYA_VRAY_ROOT/maya_vray"
 MAYA_MODULE_ROOT="$PREFIX/usr/autodesk/modules/maya"
-MAYA_ROOT="$PREFIX/usr/autodesk/maya$MAYA_VERSION"
 mkdir -p $MAYA_VRAY_ROOT
 cd $MAYA_VRAY_ROOT
 
@@ -52,26 +52,25 @@ for FILE in "$MAYA_VRAY_ROOT"/lib/aux/*.so.*; do
     patchelf --add-rpath '$ORIGIN/.' "$FILE"
 done
 
-mkdir -p "$MAYA_MODULE_ROOT/$MAYA_VERSION"
-cp "$MAYA_VRAY_ROOT/maya_root/modules/VRayForMaya.module" "$MAYA_MODULE_ROOT/VRayForMaya.module"
-cp "$MAYA_MODULE_ROOT/VRayForMaya.module" "$MAYA_MODULE_ROOT/$MAYA_VERSION/VRayForMaya.module"
-sed -i "s|+ VRayForMaya2024rhel8 0.9 ../../maya_vray|+ VRayForMaya2024rhel8 0.9 $MAYA_VRAY_MAYA_ROOT|" "$MAYA_MODULE_ROOT/VRayForMaya.module"
-cp "$MAYA_MODULE_ROOT/VRayForMaya.module" "$MAYA_MODULE_ROOT/$MAYA_VERSION/VRayForMaya.module"
-if grep -q "$MAYA_VRAY_MAYA_ROOT" "$MAYA_MODULE_ROOT/VRayForMaya.module"; then
+mkdir -p "$MAYA_MODULE_ROOT/$MAYA_MODULE_VERSION"
+cp "$MAYA_VRAY_ROOT/maya_root/modules/VRayForMaya.module" "$MAYA_MODULE_ROOT/$MAYA_MODULE_VERSION/VRayForMaya.module"
+sed -i "s|+ VRayForMaya2024rhel8 0.9 ../../maya_vray|+ VRayForMaya2024rhel8 0.9 $MAYA_VRAY_MAYA_ROOT|" "$MAYA_MODULE_ROOT/$MAYA_MODULE_VERSION/VRayForMaya.module"
+if grep -q "$MAYA_VRAY_MAYA_ROOT" "$MAYA_MODULE_ROOT/$MAYA_MODULE_VERSION/VRayForMaya.module"; then
     echo "Changing maya_root/VRayForMaya.module file path to $MAYA_VRAY_MAYA_ROOT succeeded"
 else
     echo "Failed to change maya_root/VRayForMaya.module file path "
     exit 1
 fi
 
-# Set environment variables using the JSON env_vars.d mechanism so they are picked up
-# consistently by Conda-based runtimes such as Deadline Cloud.
-mkdir -p "$PREFIX/etc/conda/env_vars.d"
-cat > "$PREFIX/etc/conda/env_vars.d/$PKG_NAME-$PKG_VERSION.json" <<EOF
-{
-  "VRAY_EULA": "https://docs.chaos.com/display/VNS/End+User+License+Agreement",
-  "MAYA_PLUG_IN_PATH": "$MAYA_ROOT/plug-ins:$MAYA_VRAY_MAYA_ROOT/plug-ins",
-  "MAYA_SCRIPT_PATH": "$MAYA_VRAY_MAYA_ROOT/scripts",
-  "XBMLANGPATH": "$MAYA_VRAY_MAYA_ROOT/icons"
-}
+# Script to set environment variables during activation
+mkdir -p $PREFIX/etc/conda/activate.d
+cat <<EOF > $PREFIX/etc/conda/activate.d/$PKG_NAME-$PKG_VERSION-vars.sh
+export "VRAY_EULA=https://docs.chaos.com/display/VNS/End+User+License+Agreement"
+EOF
+
+mkdir -p $PREFIX/etc/conda/deactivate.d
+cat <<EOF > $PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh
+if ! [ -z \$VRAY ]; then 
+    unset VRAY_EULA
+fi
 EOF

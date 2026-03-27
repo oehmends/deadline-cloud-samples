@@ -4,30 +4,19 @@
 context:
   version: "2024.2.4"
   major_version: "2024"
-  minor_version: ""
+  minor_version: "2.4"
 
 package:
   name: maya
   version: ${{ version }}
 
 source:
-  - if: linux
-    then:
-      url: file://archive_files/Autodesk_Maya_${{ major_version }}_Linux_64bit.tgz
-      sha256: d1a68841806926418213ee59f41c462d2047f3fc8aa87dd5e207a7f5cd36fc68
-      target_directory: installer
-  - if: win
-    then:
-      - url: file://archive_files/Autodesk_Maya_${{ major_version }}_${{ minor_version }}_Windows_installation.zip
-        sha256: 2a8943ef911ac88faf2342e4feda6ac1a1c38aecbd164ea6441263283696c505
-        target_directory: installer
-      # See https://www.autodesk.com/support/technical/article/caas/tsarticles/ts/75wD5ycdkRVPHQtG4eUwBL.html
-      # titled "Deploying Maya Batch on the Cloud" about making Maya for Windows cloud compliant.
-      - url: https://download.autodesk.com/us/support/files/maya_batch_cloud/cleanMayaForCloud.py
-        sha256: 8605e6e28ed5d47ee79156a42166e85750b041456679cb7339128113f2328e0a
+  path: ../../archive_files/Autodesk_Maya_${{ major_version }}_ML_Linux_64bit.tgz
+  sha256: d1a68841806926418213ee59f41c462d2047f3fc8aa87dd5e207a7f5cd36fc68
+  target_directory: installer
 
 build:
-  number: 0
+  number: 3
   # These build options for repackaging an application
   # https://prefix-dev.github.io/rattler-build/latest/build_options/#prefix-detection-replacement-options
   prefix_detection:
@@ -40,18 +29,16 @@ build:
 
 requirements:
   build:
-    - if: linux
-      then:
-      - patchelf
+    - patchelf
 
 tests:
-  - script:
-    # Maya's Python interpreter
-    - mayapy --help
-    # Confirm that mayapy can initialize maya.standalone, and that both OpenMaya 1.0 and 2.0 are available
-    - mayapy -c 'import maya; import maya.standalone; import maya.OpenMaya as om1; import maya.api.OpenMaya as om2; maya.standalone.initialize(); print("Hello from mayapy"); maya.standalone.uninitialize()'
-    # The maya -batch command
-    - maya -batch -command 'print "Hello from maya -batch"; quit -exitCode 0 -force'
+   - script:
+     # Maya's Python interpreter
+     - mayapy --help
+     # Confirm that mayapy can initialize maya.standalone, and that both OpenMaya 1.0 and 2.0 are available
+     - mayapy -c 'import maya; import maya.standalone; import maya.OpenMaya as om1; import maya.api.OpenMaya as om2; maya.standalone.initialize(); print("Hello from mayapy"); maya.standalone.uninitialize()'
+     # The maya -batch command
+     - maya -batch -command 'print "Hello from maya -batch"; quit -exitCode 0 -force'
 
 
 about:

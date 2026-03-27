@@ -9,27 +9,13 @@ set -euo pipefail
 MAYA_VERSION=${PKG_VERSION%.*}
 # The location within $PREFIX where the RPM file extracts Maya
 AUTODESK_ROOT="usr/autodesk"
-MAYA_ROOT="$AUTODESK_ROOT/maya2024"
+MAYA_ROOT="$AUTODESK_ROOT/maya$MAYA_VERSION"
 INSTALL_DIR="$PREFIX/$MAYA_ROOT"
 
-cd "$PREFIX"
-
-# Resolve the Maya RPM from Autodesk's package manifest because the RPM build
-# number does not necessarily match the Conda package version.
-MAYA_RPM_PATH="$(sed -n 's/.*file="\([^"]*Maya[^"]*\.rpm\)".*/\1/p' "$SRC_DIR/installer/Packages/pkg.maya.xml" | head -n 1)"
-if [ -n "$MAYA_RPM_PATH" ]; then
-    MAYA_RPM_PATH="$SRC_DIR/installer/$MAYA_RPM_PATH"
-else
-    MAYA_RPM_PATH="$(echo "$SRC_DIR/installer/Packages"/Maya${MAYA_VERSION}_64-*.x86_64.rpm)"
-fi
-
-if [ ! -f "$MAYA_RPM_PATH" ]; then
-    echo "Could not find Maya RPM under $SRC_DIR/installer/Packages" >&2
-    exit 1
-fi
+cd $PREFIX
 
 # Extract the Maya RPM
-rpm2cpio "$MAYA_RPM_PATH" | cpio -idm
+rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_VERSION}_64-$PKG_VERSION-*.x86_64.rpm | cpio -idm
 
 # Remove examples, they're not needed on the farm
 rm -r "$MAYA_ROOT"/Examples
@@ -42,7 +28,8 @@ ln -r -s "$INSTALL_DIR/bin/maya$MAYA_VERSION" "$INSTALL_DIR/bin/maya"
 mkdir -p "$SRC_DIR/download"
 cd "$SRC_DIR/download"
 dnf download --resolve -y freetype alsa-lib fontconfig harfbuzz libbrotli graphite2 \
-    libxkbfile xcb-util-cursor xcb-util-wm xcb-util-keysyms libxkbcommon-x11
+    libxkbfile xcb-util-wm xcb-util-keysyms libxkbcommon-x11 \
+    libva libvdpau pciutils-libs
 
 for RPM_FILE in *.rpm; do
     rpm2cpio "$RPM_FILE" | cpio -idm
@@ -52,21 +39,33 @@ done
 # This is to follow the recommendation of https://docs.conda.io/projects/conda-build/en/latest/resources/use-shared-libraries.html
 # to never use LD_LIBRARY_PATH in Conda environments.
 
-# Copy the .so libraries to the Maya lib directory, adding to their RPATHs so they see each other
-find . -type f,l -iname "*.so.*" -exec patchelf --add-rpath '$ORIGIN/.' {} \;
-find . -type f,l -iname "*.so.*" -exec cp -P {} "$INSTALL_DIR/lib/" \;
-
 # The Maya RPM has libraries in both $MAYA_ROOT/lib and $MAYA_ROOT/lib/el9
 patchelf --add-rpath '$ORIGIN/../..' "$INSTALL_DIR"/lib/python*/site-packages/*.so
 patchelf --add-rpath '$ORIGIN/../..' "$INSTALL_DIR"/lib/python*/site-packages/*/*.so
 patchelf --add-rpath '$ORIGIN/../..' "$INSTALL_DIR"/lib/python*/lib-dynload/*.so
 patchelf --add-rpath '$ORIGIN/../../el9' "$INSTALL_DIR"/lib/python*/lib-dynload/*.so
 
-# Work around rattler-build issue https://github.com/prefix-dev/rattler-build/issues/1191 that it excludes intentional .pyc files without corresponding .py.
-# Rename every .pyc file to .pyc2.
-for PYC in "$INSTALL_DIR"/lib/python*/site-packages/maya/*.pyc; do
-    mv "$PYC" "${PYC}2"
+# Copy the .so libraries to the Maya lib directory, adding to their RPATHs so they see each other
+find . -type f,l -iname "*.so.*" -exec patchelf --add-rpath '$ORIGIN/.' {} \;
+find . -type f,l -iname "*.so.*" -exec cp -P {} "$INSTALL_DIR/lib/" \;
+
+# Add RPATH for libraries in $MAYA_ROOT/lib that lack one, allowing them to
+# find dependencies in their own directory
+for file in "$INSTALL_DIR/lib"/*; do
+    if file "$file" | grep -q "ELF"; then
+        if [[ -z "$(patchelf --print-rpath "$file")" ]]; then
+            patchelf --set-rpath "\$ORIGIN" "$file"
+        fi
+    fi
 done
+
+# Create symlinks
+mkdir -p $PREFIX/bin
+ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_VERSION $PREFIX/bin/maya$MAYA_VERSION
+ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_VERSION $PREFIX/bin/maya
+ln -r -s $PREFIX/$MAYA_ROOT/bin/mayapy.bin $PREFIX/bin/mayapy.bin
+ln -r -s $PREFIX/$MAYA_ROOT/bin/mayapy $PREFIX/bin/mayapy
+ln -r -s $PREFIX/$MAYA_ROOT/bin/Render $PREFIX/bin/Render
 
 # Use thin client licensing configuration to use the ProductInformation.pit from the Arnold installation.
 #
@@ -75,61 +74,32 @@ done
 # and the Arnold support tip "error: (44) Product key not found"
 # at https://arnoldsupport.com/2022/02/02/error-44-product-key-not-found/.
 
-# Use the ProductInformation.pit from the included Arnold
-unzip -j "$SRC_DIR/installer/Packages/package.zip" bin/ProductInformation.pit -d "$INSTALL_DIR"
+unzip -j "$SRC_DIR/installer/Packages/package.zip" bin/ProductInformation.pit -d "$INSTALL_DIR/lib"
 
 cat <<EOF > "$INSTALL_DIR"/AdlmThinClientCustomEnv.xml
 <?xml version="1.0"encoding="utf-8"?>
 <ADLMCUSTOMENV VERSION="1.0.0.0">
-    <PLATFORM OS="Linux">
-        <KEY ID="ADLM_PIT_FILE_LOCATION">
-        <!--Path to the ProductInformation.pit file-->
-        <!--Default: /var/opt/Autodesk/Adlm/.config-->
-        <STRING>$INSTALL_DIR</STRING>
-        </KEY>
-    </PLATFORM>
+   <PLATFORM OS="Linux">
+       <KEY ID="ADLM_PIT_FILE_LOCATION">
+       <!--Path to the ProductInformation.pit file-->
+       <!--Default: /var/opt/Autodesk/Adlm/.config-->
+       <STRING>$INSTALL_DIR/lib</STRING>
+       </KEY>
+   </PLATFORM>
 </ADLMCUSTOMENV>
 EOF
 
-# See https://docs.conda.io/projects/conda/en/latest/dev-guide/deep-dives/activation.html
-# for details on activation.
-
-# Activation scripts to set/unset environment variables
-mkdir -p "$PREFIX/etc/conda/activate.d"
-cat <<EOF > "$PREFIX/etc/conda/activate.d/$PKG_NAME-$PKG_VERSION-vars.sh"
-export MAYA_LOCATION="\$CONDA_PREFIX/$MAYA_ROOT"
-export MAYA_VERSION="$MAYA_VERSION"
-
-# Turn off the Maya application home for the render farm
-export MAYA_NO_HOME=1
-
-# Set the Maya module path to include the virtual environment equivalent of the default system module paths
-export MAYA_MODULE_PATH="\$CONDA_PREFIX/usr/autodesk/maya$MAYA_VERSION/modules:\$CONDA_PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION:\$CONDA_PREFIX/usr/autodesk/modules/maya"
-export PATH="\$MAYA_LOCATION/bin:\$PATH"
-
-# Set thin client mode to use the correct ProductInformation.pit file
-export AUTODESK_ADLM_THINCLIENT_ENV='$INSTALL_DIR/AdlmThinClientCustomEnv.xml'
-export MAYA_LEGACY_THINCLIENT=1
-
-# Work around rattler-build issue https://github.com/prefix-dev/rattler-build/issues/1191 that it excludes intentional .pyc files without corresponding .py.
-# Rename every .pyc2 file back to .pyc.
-if [ -f "\$MAYA_LOCATION"/lib/python*/site-packages/maya/OpenMaya.pyc2 ]; then
-    for PYC2 in "\$MAYA_LOCATION"/lib/python*/site-packages/maya/*.pyc2; do
-        mv "\$PYC2" "\${PYC2%2}"
-    done
-fi
-
+# Set environment variables using the JSON env_vars.d mechanism.
+# See https://rattler-build.prefix.dev/latest/special_files/ for details.
+# This is more portable than activation scripts and works with pixi trampolines.
+mkdir -p "$PREFIX/etc/conda/env_vars.d"
+cat > "$PREFIX/etc/conda/env_vars.d/$PKG_NAME-$PKG_VERSION.json" << EOF
+{
+  "MAYA_LOCATION": "$PREFIX/$MAYA_ROOT",
+  "MAYA_VERSION": "$MAYA_VERSION",
+  "MAYA_NO_HOME": "1",
+  "MAYA_MODULE_PATH": "$PREFIX/usr/autodesk/maya$MAYA_VERSION/modules:$PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION:$PREFIX/usr/autodesk/modules/maya",
+  "AUTODESK_ADLM_THINCLIENT_ENV": "$INSTALL_DIR/AdlmThinClientCustomEnv.xml",
+  "MAYA_LEGACY_THINCLIENT": "1"
+}
 EOF
-cat "$PREFIX/etc/conda/activate.d/$PKG_NAME-$PKG_VERSION-vars.sh"
-
-mkdir -p "$PREFIX/etc/conda/deactivate.d"
-cat <<EOF > "$PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh"
-unset MAYA_LEGACY_THINCLIENT
-unset AUTODESK_ADLM_THINCLIENT_ENV
-unset MAYA_MODULE_PATH
-export PATH="\${PATH/\$MAYA_LOCATION\\/bin:/}"
-unset MAYA_NO_HOME
-unset MAYA_VERSION
-unset MAYA_LOCATION
-EOF
-cat "$PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh"
