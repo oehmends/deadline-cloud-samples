@@ -2,9 +2,9 @@
 # See https://prefix-dev.github.io/rattler-build/latest/
 
 context:
-  version: "2024.2"
+  version: "2024.2.4"
   major_version: "2024"
-  minor_version: "2"
+  minor_version: "2.4"
 
 package:
   name: maya
@@ -16,7 +16,7 @@ source:
   target_directory: installer
 
 build:
-  number: 3
+  number: 0
   # These build options for repackaging an application
   # https://prefix-dev.github.io/rattler-build/latest/build_options/#prefix-detection-replacement-options
   prefix_detection:

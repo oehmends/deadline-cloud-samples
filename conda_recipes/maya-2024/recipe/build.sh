@@ -5,10 +5,10 @@ set -x
 # Fail the script if any commands it runs fail
 set -euo pipefail
 
-# The install layout uses the Maya major version, while the package version
-# carries the minor version so it can be selected as maya=2024.2.
-MAYA_VERSION="$PKG_VERSION"
-MAYA_MAJOR_VERSION=${PKG_VERSION%.*}
+# The package version includes the full Autodesk version, while the Maya runtime
+# layout uses the minor and major versions separately.
+MAYA_VERSION=${PKG_VERSION%.*}
+MAYA_MAJOR_VERSION=${MAYA_VERSION%.*}
 # The location within $PREFIX where the RPM file extracts Maya
 AUTODESK_ROOT="usr/autodesk"
 MAYA_ROOT="$AUTODESK_ROOT/maya$MAYA_MAJOR_VERSION"

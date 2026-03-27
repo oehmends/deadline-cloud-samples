@@ -3,9 +3,9 @@
 # See https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html for information
 # about this file.
 
-{% set version = "2024.2" %}
+{% set version = "2024.2.4" %}
 {% set major_version = "2024" %}
-{% set minor_version = "2" %}
+{% set minor_version = "2.4" %}
 
 package:
   name: maya
