@@ -98,9 +98,9 @@ mkdir -p "$PREFIX/etc/conda/env_vars.d"
 cat > "$PREFIX/etc/conda/env_vars.d/$PKG_NAME-$PKG_VERSION.json" << EOF
 {
   "MAYA_LOCATION": "$PREFIX/$MAYA_ROOT",
-  "MAYA_VERSION": "$MAYA_VERSION",
+  "MAYA_VERSION": "$MAYA_MAJOR_VERSION",
   "MAYA_NO_HOME": "1",
-  "MAYA_MODULE_PATH": "$PREFIX/usr/autodesk/maya$MAYA_VERSION/modules:$PREFIX/usr/autodesk/modules/maya/$MAYA_VERSION:$PREFIX/usr/autodesk/modules/maya",
+  "MAYA_MODULE_PATH": "$PREFIX/usr/autodesk/maya$MAYA_MAJOR_VERSION/modules:$PREFIX/usr/autodesk/modules/maya/$MAYA_MAJOR_VERSION:$PREFIX/usr/autodesk/modules/maya",
   "AUTODESK_ADLM_THINCLIENT_ENV": "$INSTALL_DIR/AdlmThinClientCustomEnv.xml",
   "MAYA_LEGACY_THINCLIENT": "1"
 }
