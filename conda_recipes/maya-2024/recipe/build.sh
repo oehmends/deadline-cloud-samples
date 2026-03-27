@@ -17,7 +17,7 @@ INSTALL_DIR="$PREFIX/$MAYA_ROOT"
 cd $PREFIX
 
 # Extract the Maya RPM
-rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_MAJOR_VERSION}_64-$PKG_VERSION.*.x86_64.rpm | cpio -idm
+rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_MAJOR_VERSION}_64-$PKG_VERSION-*.x86_64.rpm | cpio -idm
 
 # Remove examples, they're not needed on the farm
 rm -r "$MAYA_ROOT"/Examples
