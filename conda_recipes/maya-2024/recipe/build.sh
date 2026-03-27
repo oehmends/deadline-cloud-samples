@@ -9,7 +9,7 @@ set -euo pipefail
 MAYA_VERSION=${PKG_VERSION%.*}
 # The location within $PREFIX where the RPM file extracts Maya
 AUTODESK_ROOT="usr/autodesk"
-MAYA_ROOT="$AUTODESK_ROOT/maya$MAYA_VERSION"
+MAYA_ROOT="$AUTODESK_ROOT/maya2024"
 INSTALL_DIR="$PREFIX/$MAYA_ROOT"
 
 cd "$PREFIX"
