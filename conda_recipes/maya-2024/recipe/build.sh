@@ -5,23 +5,25 @@ set -x
 # Fail the script if any commands it runs fail
 set -euo pipefail
 
-# The version without the update number
-MAYA_VERSION=${PKG_VERSION%.*}
+# The install layout uses the Maya major version, while the package version
+# carries the minor version so it can be selected as maya=2024.2.
+MAYA_VERSION="$PKG_VERSION"
+MAYA_MAJOR_VERSION=${PKG_VERSION%.*}
 # The location within $PREFIX where the RPM file extracts Maya
 AUTODESK_ROOT="usr/autodesk"
-MAYA_ROOT="$AUTODESK_ROOT/maya$MAYA_VERSION"
+MAYA_ROOT="$AUTODESK_ROOT/maya$MAYA_MAJOR_VERSION"
 INSTALL_DIR="$PREFIX/$MAYA_ROOT"
 
 cd $PREFIX
 
 # Extract the Maya RPM
-rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_VERSION}_64-$PKG_VERSION.*.x86_64.rpm | cpio -idm
+rpm2cpio "$SRC_DIR/installer/Packages"/Maya${MAYA_MAJOR_VERSION}_64-$PKG_VERSION.*.x86_64.rpm | cpio -idm
 
 # Remove examples, they're not needed on the farm
 rm -r "$MAYA_ROOT"/Examples
 
 # Maya needs this symlink that rpm2cpio did not create
-ln -r -s "$INSTALL_DIR/bin/maya$MAYA_VERSION" "$INSTALL_DIR/bin/maya"
+ln -r -s "$INSTALL_DIR/bin/maya$MAYA_MAJOR_VERSION" "$INSTALL_DIR/bin/maya"
 
 # Install dependencies not available on Deadline Cloud service-managed fleets
 # from the system package manager, dnf.
@@ -61,8 +63,8 @@ done
 
 # Create symlinks
 mkdir -p $PREFIX/bin
-ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_VERSION $PREFIX/bin/maya$MAYA_VERSION
-ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_VERSION $PREFIX/bin/maya
+ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_MAJOR_VERSION $PREFIX/bin/maya$MAYA_MAJOR_VERSION
+ln -r -s $PREFIX/$MAYA_ROOT/bin/maya$MAYA_MAJOR_VERSION $PREFIX/bin/maya
 ln -r -s $PREFIX/$MAYA_ROOT/bin/mayapy.bin $PREFIX/bin/mayapy.bin
 ln -r -s $PREFIX/$MAYA_ROOT/bin/mayapy $PREFIX/bin/mayapy
 ln -r -s $PREFIX/$MAYA_ROOT/bin/Render $PREFIX/bin/Render

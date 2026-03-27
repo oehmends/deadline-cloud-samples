@@ -8,7 +8,7 @@ context:
 
 package:
   name: maya
-  version: ${{ major_version }}
+  version: ${{ version }}
 
 source:
   path: ../../archive_files/Autodesk_Maya_${{ major_version }}_Linux_64bit.tgz
