@@ -8,6 +8,7 @@ MAYA_VRAY_ROOT="$PREFIX/opt/chaos/maya-vray-$MAYA_VERSION"
 MAYA_VRAY_VRAY_ROOT="$MAYA_VRAY_ROOT/vray"
 MAYA_VRAY_MAYA_ROOT="$MAYA_VRAY_ROOT/maya_vray"
 MAYA_MODULE_ROOT="$PREFIX/usr/autodesk/modules/maya"
+MAYA_ROOT="$PREFIX/usr/autodesk/maya$MAYA_VERSION"
 mkdir -p $MAYA_VRAY_ROOT
 cd $MAYA_VRAY_ROOT
 
@@ -63,24 +64,14 @@ else
     exit 1
 fi
 
-# Script to set environment variables during activation
-mkdir -p $PREFIX/etc/conda/activate.d
-cat <<EOF > $PREFIX/etc/conda/activate.d/$PKG_NAME-$PKG_VERSION-vars.sh
-export "VRAY_EULA=https://docs.chaos.com/display/VNS/End+User+License+Agreement"
-if [ -n "\${MAYA_PLUG_IN_PATH:-}" ]; then
-    export MAYA_PLUG_IN_PATH="$MAYA_VRAY_MAYA_ROOT/plug-ins:\$MAYA_PLUG_IN_PATH"
-else
-    export MAYA_PLUG_IN_PATH="$MAYA_VRAY_MAYA_ROOT/plug-ins"
-fi
-EOF
-
-mkdir -p $PREFIX/etc/conda/deactivate.d
-cat <<EOF > $PREFIX/etc/conda/deactivate.d/$PKG_NAME-$PKG_VERSION-vars.sh
-if [ -n "\${MAYA_PLUG_IN_PATH:-}" ]; then
-    export MAYA_PLUG_IN_PATH="\${MAYA_PLUG_IN_PATH#$MAYA_VRAY_MAYA_ROOT/plug-ins:}"
-    if [ "\$MAYA_PLUG_IN_PATH" = "$MAYA_VRAY_MAYA_ROOT/plug-ins" ]; then
-        unset MAYA_PLUG_IN_PATH
-    fi
-fi
-unset VRAY_EULA
+# Set environment variables using the JSON env_vars.d mechanism so they are picked up
+# consistently by Conda-based runtimes such as Deadline Cloud.
+mkdir -p "$PREFIX/etc/conda/env_vars.d"
+cat > "$PREFIX/etc/conda/env_vars.d/$PKG_NAME-$PKG_VERSION.json" <<EOF
+{
+  "VRAY_EULA": "https://docs.chaos.com/display/VNS/End+User+License+Agreement",
+  "MAYA_PLUG_IN_PATH": "$MAYA_ROOT/plug-ins:$MAYA_VRAY_MAYA_ROOT/plug-ins",
+  "MAYA_SCRIPT_PATH": "$MAYA_VRAY_MAYA_ROOT/scripts",
+  "XBMLANGPATH": "$MAYA_VRAY_MAYA_ROOT/icons"
+}
 EOF
